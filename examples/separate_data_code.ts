@@ -14,3 +14,7 @@ class Author {
     return this.#books > 100;
   }
 }
+
+
+const author = new Author();
+author.

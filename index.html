@@ -201,6 +201,549 @@
           <li>Отделение схемы от представления</li>
         </ol>
       </section>
+      <section>
+        <h2>1. Отделяем код от данных</h2>
+      </section>
+      <section>
+        <h3>Можно написать так...</h3>
+          <pre class="fragment"><code data-trim data-line-numbers="1-13|3-5|7-9|10-12|17-18|1-18">
+class Author {
+  constructor(firstName, lastName, books) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.books = books;
+  }
+  fullName() {
+    return this.firstName + " " + this.lastName;
+  }
+  isProlific() {
+    return this.books > 100;
+  }
+}
+
+
+
+var obj = createAuthorObject("Isaac", "Asimov", 500);
+obj.fullName();
+          </code></pre>
+      </section>
+        <section>
+          <h3>Разделяем данные и код</h3>
+<pre><code data-trim data-line-numbers="1-25|1-7|9-13|15-19|24-25|1-25">
+class AuthorData {
+  constructor(firstName, lastName, books) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.books = books;
+  }
+}
+
+class NameCalculation {
+  static fullName(data) {
+    return data.firstName + " " + data.lastName;
+  }
+}
+
+class AuthorRating {
+  static isProlific (data) {
+    return data.books > 100;
+  }
+}
+
+
+
+
+var data = new AuthorData("Isaac", "Asimov", 500);
+NameCalculation.fullName(data);
+          </code></pre>
+        </section>
+      <section>
+        <h3>Или так...</h3>
+          <pre><code data-trim data-line-numbers="1-10|4|7|1-10">
+function createAuthorObject(firstName, lastName, books) {
+  return {
+    fullName: function() {
+      return firstName + " " + lastName;
+    },
+    isProlific: function () {
+      return books > 100;
+    }
+  };
+}
+          </code></pre>
+        </section>
+        <section>
+          <h3>Изменения в ФП стиле</h3>
+<pre><code data-trim data-line-numbers="1-15|1-7|9-11|13-15|20-22|1-22">
+function createAuthorData(firstName, lastName, books) {
+  return {
+    firstName: firstName,
+    lastName: lastName,
+    books: books
+  };
+}
+
+function fullName(data) {
+  return data.firstName + " " + data.lastName;
+}
+
+function isProlific (data) {
+  return data.books > 100;
+}
+
+
+
+
+var data = createAuthorData("Isaac", "Asimov", 500);
+fullName(data);
+          </code></pre>
+        </section>
+        <section data-auto-animate>
+          <h3>Плюсы</h3>
+        </section>
+        <section data-auto-animate>
+          <h3>Плюсы</h3>
+          <ul>
+            <li>Код может быть переиспользован в разных контекстах</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Переиспользование кода в ООП </h3>
+          <pre><code data-trim data-line-numbers="1-13|7-9">
+class Author {
+  constructor(firstName, lastName, books) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.books = books;
+  }
+  fullName() {
+    return this.firstName + " " + this.lastName;
+  }
+  isProlific() {
+    return this.books > 100;
+  }
+}
+          </code></pre>
+        </section>
+        <section>
+          <h3>Переиспользование кода в ООП
+            <br>
+            <small>наследование</small>
+          </h3>
+          <pre><code data-trim data-line-numbers="1-22|1-9|10-15|16-21|1-22">
+class Person {
+  constructor(firstName, lastName){
+    this.firstName = firstName;
+    this.lastName = lastName
+  }
+  fullName() {
+    return this.firstName + " " + this.lastName;
+  }
+}
+class Author extends Person {
+  constructor(firstName, lastName, books) {
+    super(firstName, lastName)
+    ...
+  }
+}
+class User extends Person {
+  constructor(firstName, lastName, books) {
+    super(firstName, lastName)
+    ...
+  }
+}
+          </code></pre>
+        </section>
+        <section>
+          <h3>Переиспользование кода в ООП
+            <br>
+            <small>композиция</small>
+          </h3>
+          <pre><code data-trim data-line-numbers="1-18|1-9|6-8|10-14|17-18|1-18">
+class Person {
+  constructor(firstName, lastName){
+    this.firstName = firstName;
+    this.lastName = lastName
+  }
+  fullName() {
+    return this.firstName + " " + this.lastName;
+  }
+}
+class Author {
+  constructor(person) {
+    this.person = person
+    ...
+  }
+}
+
+var person = new Person('Isaac', ' Asimov')
+var author = new Author(person)
+          </code></pre>
+        </section>
+        <section>
+          <h3>В DOP</h3>
+          <pre><code data-trim data-line-numbers="1-18|1-3|5-7|9-11|14-18|15,18|1-18">
+function createAuthorData(firstName, lastName, books) {
+  return {firstName: firstName, lastName: lastName, books: books};
+}
+
+function createUserData(firstName, lastName, email) {
+  return {firstName: firstName, lastName: lastName, email: email};
+}
+
+function fullName(data) {
+  return data.firstName + " " + data.lastName;
+}
+
+
+var authorData = createAuthorData("Isaac", "Asimov", 500);
+fullName(authorData); // Isaac Asimov
+
+var userData = createUserData("John", "Doe", "john@doe.com");
+fullName(userData); // John Doe
+          </code></pre>
+        </section>
+        <section data-auto-animate>
+          <h3>Плюсы</h3>
+          <ul>
+            <li>Код может быть переиспользован в разных контекстах</li>
+          </ul>
+        </section>
+        <section data-auto-animate>
+          <h3>Плюсы</h3>
+          <ul>
+            <li>Код может быть переиспользован в разных контекстах</li>
+            <li>Тестирование без бойлерплейта</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Тестирование</h3>
+          <pre class="fragment" data-fragment-index="0"><code class="js" data-trim>
+const author =  createAuthorObject("Isaac", "Asimov", 500);
+
+assert(author.fullName() === "Isaac Asimov")
+          </code></pre>
+          <p class="fragment" data-fragment-index="1">vs</p>
+<pre class="fragment" data-fragment-index="1"><code class="js" data-trim>
+const author =  {
+  firstName: "Isaac",
+  lastName: "Asimov"
+};
+
+assert(fullName(author) === "Isaac Asimov")
+</code></pre>
+        </section>
+        <section data-auto-animate>
+          <h3>Плюсы</h3>
+          <ul>
+            <li>Код может быть переиспользован в разных контекстах</li>
+            <li>Тестирование без бойлерплейта</li>
+          </ul>
+        </section>
+        <section data-auto-animate>
+          <h3>Плюсы</h3>
+          <ul>
+            <li>Код может быть переиспользован в разных контекстах</li>
+            <li>Тестирование без бойлерплейта</li>
+            <li>Кодовая база менее сложная</li>
+          </ul>
+        </section>
+        <section>
+          <p>Про легкость понимания кода</p>
+          <a href="http://mng.bz/enzq">http://mng.bz/enzq</a>
+          <p class="fragment">Вспомните про композицию vs наследование</p>
+        </section>
+        <section>
+          <img src="img/complex-class-relation.png" alt="">
+        </section>
+        <section>
+          <img src="img/data-code-relation.png" alt="">
+        </section>
+        <section data-auto-animate>
+          <h3>Минусы</h3>
+        </section>
+        <section data-auto-animate>
+          <h3>Минусы</h3>
+          <ul>
+            <li>Потерялась инкапсуляция</li>
+          </ul>
+        </section>
+        <section data-transition="slide none">
+          <p>Сокрытие и контроль</p>
+          <pre><code data-trim data-line-numbers>
+class Author {
+  ...
+  constructor(firstName, lastName, books) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.books = books;
+  }
+  fullName() {
+    return this.firstName + " " + this.lastName;
+  }
+  isProlific() {
+    return this.books > 100;
+  }
+}
+          </code></pre>
+        </section>
+        <section data-transition="none">
+          <p>Сокрытие и контроль</p>
+          <pre><code data-trim data-line-numbers>
+class Author {
+  ...
+  constructor(firstName, lastName, books) {
+    this.#firstName = firstName;
+    this.#lastName = lastName;
+    this.#books = books;
+  }
+  fullName() {
+    return this.#firstName + " " + this.#lastName;
+  }
+  isProlific() {
+    return this.#books > 100;
+  }
+}
+          </code></pre>
+        </section>
+        <section data-auto-animate>
+          <h3>Минусы</h3>
+          <ul>
+            <li>Потерялась инкапсуляция</li>
+          </ul>
+        </section>
+        <section data-auto-animate>
+          <h3>Минусы</h3>
+          <ul>
+            <li>Потерялась инкапсуляция</li>
+            <li>Потерялась модульность</li>
+          </ul>
+        </section>
+        <section>
+          <img src="img/autocomplete.png" alt="autocomplete in IDE">
+        </section>
+        <section data-auto-animate>
+          <h3>Минусы</h3>
+          <ul>
+            <li>Потерялась инкапсуляция</li>
+            <li>Потерялась модульность</li>
+          </ul>
+        </section>
+        <section data-auto-animate>
+          <h3>Минусы</h3>
+          <ul>
+            <li>Потерялась инкапсуляция</li>
+            <li>Потерялась модульность</li>
+            <li>Больше сущностей</li>
+          </ul>
+        </section>
+        <section>
+          <img src="img/data-code-relation.png" alt="">
+        </section>
+        <section>
+          <h2>2. Стандартные структуры данных</h2>
+        </section>
+        <section>
+          <blockquote cite="http://en.wikipedia.org/wiki/Epigrams_on_Programming">
+          It is better to have 100 functions operate on one data structure than to have 10 functions operate on 10 data structures.
+              <p>&mdash; Alan Perlis', <cite>Epigrams on Programming</cite></p>
+            </p>
+
+          </blockquote>
+        </section>
+        <section data-auto-animate>
+          <h3>Плюсы</h3>
+        </section>
+        <section data-auto-animate>
+          <h3>Плюсы</h3>
+          <ul>
+            <li>Сериализация из коробки</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Сериализация из коробки</h3>
+          <pre><code data-trim>
+const data = createAuthorData("Isaac", "Asimov", 500);
+JSON.stringify(data);
+          </code></pre>
+        </section>
+        <section data-auto-animate>
+          <h3>Плюсы</h3>
+          <ul>
+            <li>Сериализация из коробки</li>
+          </ul>
+        </section>
+        <section data-auto-animate>
+          <h3>Плюсы</h3>
+          <ul>
+            <li>Сериализация из коробки</li>
+            <li>Много всего уже написано</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Многое из коробки</h3>
+          <pre><code class="js" data-trim data-line-numbers="1-6|4|1-6">
+const data = createAuthorData("Isaac", "Asimov", 500);
+
+const dataWithoutBooks =
+            _.pick(data, ["firstName", "lastName"]);
+
+JSON.stringify(dataWithoutBooks);
+          </code></pre>
+          <p class="fragment">_.get, _.set, _.filter</p>
+        </section>
+        <section data-auto-animate>
+          <h3>Плюсы</h3>
+          <ul>
+            <li>Сериализация из коробки</li>
+            <li>Много всего уже написано</li>
+          </ul>
+        </section>
+        <section data-auto-animate>
+          <h3>Плюсы</h3>
+          <ul>
+            <li>Сериализация из коробки</li>
+            <li>Много всего уже написано</li>
+            <li>Станартные паттерны</li>
+          </ul>
+        </section>
+        <section>
+          <h2>Классика OOP</h2>
+          <p>Адаптер адаптером погоняет</p>
+          <img src="img/standart.webp" alt="">
+        </section>
+        <section>
+          <h2>До</h2>
+<pre><code data-trim>
+function removeAuthorDuplicates(book) {
+  const authors = _.get(book, "authors");
+  const uniqAuthors = _.uniq(authors);
+  return _.set(book,"authors", uniqAuthors);
+}
+</code></pre>
+        </section>
+        <section>
+          <h2>После</h2>
+          <pre><code data-trim>
+function update(map, path, fun) {
+  var currentValue = _.get(map, path);
+  var nextValue = fun(currentValue);
+  return _.set(map, path, nextValue);
+}
+          </code></pre>
+          <pre class="fragment"><code data-trim>
+function removeAuthorDuplicates(book) {
+         return update(book, "authors", _.uniq);
+}
+          </code></pre>
+        </section>
+        <section data-auto-animate>
+          <h3>Минусы</h3>
+          <ul>
+            <li>Нет схемы</li>
+          </ul>
+        </section>
+        <section data-auto-animate>
+          <h3>Минусы</h3>
+          <ul>
+            <li>Нет схемы</li>
+            <li>Нет рантайм проверок</li>
+          </ul>
+        </section>
+        <section>
+          <h2>3. Неизменяемые данные</h2>
+        </section>
+        <section data-auto-animate>
+          <h2>Плюсы</h2>
+        </section>
+        <section data-auto-animate>
+          <h2>Плюсы</h2>
+          <ul>
+            <li>Уверенность в данных</li>
+          </ul>
+        </section>
+        <section>
+          <h2>Данные в JS меняются неожиданно</h2>
+          <pre><code data-trim>
+const myData = {num: 42};
+const yourData = myData;
+
+yourData.num = yourData.num + 1;
+console.log(myData.num); // 43
+          </code></pre>
+        </section>
+        <section>
+          <pre><code data-trim>
+function changeValue(obj, k, v) {
+  const res = Object.assign({}, obj);
+  res[k] = v;
+  return res;
+}
+
+const myData = {num: 42};
+const yourData = changeValue(myData, "num", myData.num + 1);
+console.log(myData.num); // 42
+          </code></pre>
+        </section>
+        <section data-auto-animate>
+          <h2>Плюсы</h2>
+          <ul>
+            <li>Уверенность в данных</li>
+          </ul>
+        </section>
+        <section data-auto-animate>
+          <h2>Плюсы</h2>
+          <ul>
+            <li>Уверенность в данных</li>
+            <li>Предсказуемость кода</li>
+          </ul>
+        </section>
+        <section>
+          <h2>Данные могут меняться непредсказуемо</h2>
+          <pre><code data-trim>
+const myData = {num: 42};
+
+setTimeout(function (data){
+  console.log(data.num); // 0
+}, 1000, myData);
+
+myData.num = 0;
+          </code></pre>
+        </section>
+        <section data-auto-animate>
+          <h2>Плюсы</h2>
+          <ul>
+            <li>Уверенность в данных</li>
+            <li>Предсказуемость кода</li>
+          </ul>
+        </section>
+        <section data-auto-animate>
+          <h2>Плюсы</h2>
+          <ul>
+            <li>Уверенность в данных</li>
+            <li>Предсказуемость кода</li>
+            <li>Быстрые проверки</li>
+          </ul>
+        </section>
+        <section>
+          <h2>=== vs _.equal</h2>
+        </section>
+        <section data-auto-animate>
+          <h2>Минусы</h2>
+          <ul>
+            <li>Нужна библиотека</li>
+            <li>Уменьшение перформанса</li>
+          </ul>
+        </section>
+        <section>
+          <p>Список библиотек</p>
+          <ul>
+            <li><a href="https://github.com/lodash/lodash/wiki/fp-guide">Lodash/fp (deprecated)</a></li>
+            <li><a href="https://ramdajs.com/docs/">Ramda</a></li>
+            <li><a href="https://immerjs.github.io/immer/">Immer</a></li>
+            <li><a href="https://immutable-js.com/">Immutable</a></li>
+          </ul>
+        </section>
     </div>
   </div>
   <script src="dist/reveal.js"></script>

@@ -744,6 +744,254 @@ myData.num = 0;
             <li><a href="https://immutable-js.com/">Immutable</a></li>
           </ul>
         </section>
+        <section>
+          <h2>4.Отделение схемы от представления</h2>
+        </section>
+        <section>
+          <h2>JSON Schema</h2>
+          <pre><code class="js" data-trim>
+const addAuthorRequestSchema = {
+  "type": "object", // (1)
+  "required": ["firstName", "lastName"], // (2)
+  "properties": {
+    "firstName": {"type": "string"}, // (3)
+    "lastName": {"type": "string"}, // (4)
+    "books": {"type": "integer"} // (5)
+  }
+};
+          </code></pre>
+        </section>
+        <section>
+          <pre><code data-trim class="js">
+var validAuthorData = {
+  firstName: "Isaac",
+  lastName: "Asimov",
+  books: 500
+};
+
+ajv.validate(addAuthorRequestSchema,
+             validAuthorData);
+          </code></pre>
+        </section>
+        <section data-auto-animate>
+          <h2>Плюсы</h2>
+          <ul>
+            <li>Гибкая валидация</li>
+          </ul>
+        </section>
+        <section data-auto-animate>
+          <h2>Плюсы</h2>
+          <ul>
+            <li>Гибкая валидация</li>
+            <li>Сложная валидация</li>
+          </ul>
+        </section>
+        <section data-auto-animate>
+          <h2>Плюсы</h2>
+          <ul>
+            <li>Гибкая валидация</li>
+            <li>Сложная валидация</li>
+            <li>Генерация схем и данных</li>
+          </ul>
+        </section>
+        <section data-auto-animate>
+          <h2>Плюсы</h2>
+          <ul>
+            <li>Гибкая валидация</li>
+            <li>Сложная валидация</li>
+            <li>Генерация схем и данных</li>
+            <li>OpenAPI</li>
+          </ul>
+        </section>
+        <section data-auto-animate>
+          <h2>Минусы</h2>
+          <ul>
+            <li>Перформанс</li>
+            <li>Сложно связывать данные и схему</li>
+          </ul>
+        </section>
+        <section>
+          <p>Несколько слов про SOLID</p>
+        </section>
+        <section data-transition="slide none">
+          <pre><code data-trim>
+class Author {
+  ...
+  fullName() {
+    return this.firstName + " " + this.lastName;
+  }
+}
+          </code></pre>
+        </section>
+        <section data-transition="slide none">
+          <pre><code data-trim>
+  fullName({firstName, lastName}) {
+    return firstName + " " + lastName;
+  }
+          </code></pre>
+        </section>
+        <section>
+          <ul>
+            <li>S &mdash; функция идеальный SRP. Валиадция отдельно</li>
+            <li>?</li>
+            <li>L &mdash;  нет иерархии, нет проблемы</li>
+            <li>I &mdash; передаем то, что нужно</li>
+            <li>D &mdash; не нужен DI, легко просто зависить от абстракций</li>
+          </ul>
+        </section>
+        <section>
+          <h2>Что c буквой O?!</h2>
+          <p>Open–closed principle</p>
+        </section>
+        <section>
+          <h2>Полиморфизм</h2>
+        </section>
+        <section>
+          <p>Классический пример</p>
+          <pre style="font-size: 0.3em"><code class="js" data-trim data-line-numbers>
+interface IAnimal {
+    public void greet();
+}
+class Dog implements IAnimal {
+    private String name;
+    public void greet() {
+        System.out.println("Woof woof! My name is " + animal.name);
+    }
+}
+class Cat implements IAnimal {
+    private String name;
+    public void greet() {
+        System.out.println("Meow! I am " + animal.name);
+    }
+}
+class Cow implements IAnimal {
+    private String name;
+    public void greet() {
+        System.out.println("Moo! Call me " + animal.name);
+    }
+}
+          </code></pre>
+        </section>
+        <section>
+          <h2>В мире DOP и JS</h2>
+          <pre><code class="js" data-trim>
+function greet(animal) {
+  switch (animal.type) {
+    case "dog":
+      console.log("Woof Woof! My name is: " + animal.name);
+      break;
+    case "cat":
+      console.log("Meow! I am: " + animal.name);
+      break;
+    case "cow":
+      console.log("Moo! Call me " + animal.name);
+      break;
+  };
+}
+          </code></pre>
+        </section>
+        <section>
+          <pre style="font-size: 0.38em;"><code class="js" data-trim data-line-numbers="1-22|1-9|10-22">
+function greetDog(animal) {
+  console.log("Woof Woof! My name is: " + animal.name);
+}
+function greetCat(animal) {
+  console.log("Meow! I am: " + animal.name);
+}
+function greetCow(animal) {
+  console.log("Moo! Call me " + animal.name);
+}
+function greet(animal) {
+  switch (animal.type) {
+    case "dog":
+      greetDog(animal);
+      break;
+    case "cat":
+      greetCat(animal);
+      break;
+    case "cow":
+      greetCow(animal);
+      break;
+  };
+}
+          </code></pre>
+        </section>
+        <section>
+          <img src="img/multimethod-animal.png" alt="multimethod on animal example">
+        </section>
+        <section>
+          <h2>Библиотека для мультиметода</h2>
+          <a href="https://github.com/caderek/arrows/tree/master/packages/multimethod">arrows/multimethod</a>
+        </section>
+        <section>
+          <h2>Простой случай</h2>
+          <pre><code data-trim class="js" data-line-numbers="1-17|1|3-7|9-13|16-17">
+let greet = multi(animal =&gt; animal.type);
+
+// dog
+function greetDog(animal) {
+  console.log("Woof woof! My name is " + animal.name);
+}
+greet = method("dog", greetDog)(greet);
+
+// cat
+function greetCat(animal) {
+  console.log("Meow! I am " + animal.name);
+}
+greet = method("cat", greetCat)(greet);
+
+
+greet({type: "dog", name: "Fido"});
+greet({type: "cat", name: "Tom"});
+          </code></pre>
+        </section>
+        <section>
+          <h2>Множественный диспатч</h2>
+          <pre style="font-size: 0.5em;"><code class="js" data-trim data-line-numbers="1-7|1-2|4-6|7|9">
+let greetLang = multi((animal, language)
+            =&gt; [animal.type, language.type]);
+
+function greetLangDogEn(animal, language) {
+  //...
+}
+greetLang = method([&quot;dog&quot;, &quot;en&quot;], greetLangDogEn)(greetLang);
+
+greetLang(myDog, french); // "Ouaf Ouaf! Mon nom est Fido et je parle Français"
+          </code></pre>
+        </section>
+        <section>
+          <h2>Динамический диспатч</h2>
+          <pre><code class="js" data-trim>
+let dysGreet = multi(
+            animal =&gt; [animal.type, animal.name.length &gt; 5]);
+
+function dysGreetDogShort(animal) {
+  console.log(&quot;Woof woof! My name is &quot; + animal.name);
+}
+
+
+dysGreet = method([&quot;dog&quot;, false], dysGreetDogShort)(dysGreet);
+          </code></pre>
+        </section>
+        <section>
+          <h2>Про перформанс</h2>
+          <p>Data-oriented design и мономорфизм</p>
+        </section>
+        <section data-auto-animate>
+          <h1>Выводы</h1>
+        </section>
+        <section data-auto-animate>
+          <h1>Выводы</h1>
+          <ul>
+            <li>DOP может улучшить ваш код</li>
+            <li>DOP может сделать код хуже</li>
+            <li>DOP легко комбинируется c OOP, FP etc</li>
+            <li>Учить новое полезно</li>
+          </ul>
+        </section>
+        <section>
+          <h2>Спасибо!</h2>
+        </section>
     </div>
   </div>
   <script src="dist/reveal.js"></script>
